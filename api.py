@@ -1,6 +1,5 @@
 # import requests
 import requests
-import json
 from dotenv import load_dotenv
 import json
 import os
@@ -12,6 +11,7 @@ load_dotenv()
 
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
+
 
 class SpotifyAPI(object):
     access_token = None

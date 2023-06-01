@@ -17,6 +17,7 @@ charset-normalizer==3.1.0
 click==8.1.3
 colorama==0.4.6
 comm==0.1.3
+commonmark==0.9.1
 debugpy==1.6.7
 decorator==5.1.1
 defusedxml==0.7.1
@@ -69,7 +70,8 @@ parso==0.8.3
 pathspec==0.11.1
 pickleshare==0.7.5
 pip-tools==6.13.0
-platformdirs==3.5.1
+platformdirs==2.6.2
+pluggy==1.0.0
 prometheus-client==0.17.0
 prompt-toolkit==3.0.38
 psutil==5.9.5
@@ -79,6 +81,7 @@ Pygments==2.15.1
 pylint==2.17.4
 pyproject_hooks==1.0.0
 pyrsistent==0.19.3
+pyscript==0.2.5
 python-dateutil==2.8.2
 python-dotenv==1.0.0
 python-json-logger==2.0.7
@@ -91,6 +94,8 @@ QtPy==2.3.1
 requests==2.31.0
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
+rich==12.6.0
+rich-click==1.6.1
 Send2Trash==1.8.2
 six==1.16.0
 sniffio==1.3.0
@@ -98,10 +103,12 @@ soupsieve==2.4.1
 stack-data==0.6.2
 terminado==0.17.1
 tinycss2==1.2.1
+toml==0.10.2
 tomli==2.0.1
 tomlkit==0.11.8
 tornado==6.3.2
 traitlets==5.9.0
+typer==0.4.2
 typing_extensions==4.6.2
 uri-template==1.2.0
 urllib3==2.0.2
