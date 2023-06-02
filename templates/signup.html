@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Hello, world!</title>
+  <title>SpotifyAPI</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
@@ -71,23 +71,19 @@
 </head>
 <body>
     
-  <form action="/action_page.php">
-    <h1>Login Form</h1>
+  <form method="POST">
+    <h1>Signup Form</h1>
     <div class="formcontainer">
     <hr/>
     <div class="container">
       <label for="uname"><strong>Username</strong></label>
-      <input type="text" id="email_text" placeholder="Enter Username" name="uname" required>
+      <input type="text" id="email_text" placeholder="Enter email" name="email" required>
       <label for="psw"><strong>Password</strong></label>
-      <input type="password" placeholder="Enter Password" name="psw" required>
+      <input type="password" placeholder="Enter Password" name="password" required>
+      <label for="psw"><strong>Password Confirm</strong></label>
+      <input type="password" placeholder="Confirm Password" name="password_confirm" required>
     </div>
-    <button type="submit">Login</button>
-    <div class="container" style="background-color: #eee">
-      <label style="padding-left: 15px">
-      <input type="checkbox"  checked="checked" name="remember"> Remember me
-      </label>
-      <span class="psw"><a href="#"> Forgot password?</a></span>
-    </div>
+    <button type="submit">SIgnup</button>
   </form>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 

@@ -6,7 +6,7 @@ import os
 import base64
 import datetime
 from urllib.parse import urlencode
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -48,9 +48,26 @@ templates = Jinja2Templates(directory="templates")
 async def read_item(request: Request):
     context = {
         "request": request,
-        "abc": 123
     }
     return templates.TemplateResponse("home.html", context)
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_get_view(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.post("/login", response_class=HTMLResponse)
+async def login_post_view(request: Request, email: str=Form(...), password: str=Form(...)):
+    print(email, password)
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.get("/signup", response_class=HTMLResponse)
+async def signup_get_view(request: Request):
+    return templates.TemplateResponse("signup.html", {"request": request})
+
+@app.post("/signup", response_class=HTMLResponse)
+async def signup_post_view(request: Request, email: str=Form(...), password: str=Form(...), password_confirm: str=Form(...)):
+    print(email, password)
+    return templates.TemplateResponse("signup.html", {"request": request})
 
 @app.get("/typer")
 async def redirect_typer():
