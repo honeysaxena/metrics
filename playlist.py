@@ -1,7 +1,9 @@
 from urllib.parse import urlencode
 import api
 import requests
-
+from fastapi import Header, Depends
+from typing import Annotated
+from fastapi.responses import RedirectResponse
 
 
 headers = {
@@ -16,4 +18,4 @@ print(lookup_url)
 
 r = requests.get(lookup_url, headers=headers)
 print(r.status_code)
-print(r.json())
+#print(r.json())

@@ -6,13 +6,38 @@ import os
 import base64
 import datetime
 from urllib.parse import urlencode
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
+from fastapi.responses import RedirectResponse
+from . import config
 
 load_dotenv()
+
+app = FastAPI()
+settings = config.get_settings()
+
+@app.get("/home")
+def homepage():
+    return {"hello": "world"}
 
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
+@app.get("/", response_class=HTMLResponse)
+async def read_item(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@app.get("/typer")
+async def redirect_typer():
+    return RedirectResponse("https://typer.tiangolo.com")
+
+ 
 class SpotifyAPI(object):
     access_token = None
     access_token_expires = datetime.datetime.now()
@@ -20,7 +45,8 @@ class SpotifyAPI(object):
     client_id = None
     client_secret = None
     token_url = "https://accounts.spotify.com/api/token"
-    
+
+   
     def __init__(self, client_id, client_secret, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.client_id = client_id
@@ -93,13 +119,10 @@ class SpotifyAPI(object):
         if r.status_code not in range(200, 299):
             return {}
         return r.json()
-
-    def get_album(self, _id):
-        return self.get_resource(_id, resource_type="albums")
-        
-
+    
+   
     def get_artist(self, _id):
-        return self.get_resource(_id, resource_type="artists")
+        return self.get_resource(_id, resource_type="artists")  
     
     def base_search(self, query_params):
         headers = self.get_resource_header()
@@ -121,13 +144,16 @@ class SpotifyAPI(object):
         print(query_params)
         return self.base_search(query_params)
 
+   
+
 spotify = SpotifyAPI(client_id, client_secret)    
-print(spotify.perform_auth())
+#print(spotify.perform_auth())
+print(spotify.get_access_token())
 #print(spotify.search("Time", search_type="Track"))
 #print(spotify.get_artist("0TnOYISbd1XYRBk9myaseg"))
 #access_token = spotify.access_token
 #print(access_token)
-print(spotify.search({"track": "Time"}, search_type="track"))
+#print(spotify.search({"track": "Time"}, search_type="track"))
 
 
 
