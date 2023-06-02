@@ -12,11 +12,16 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from fastapi.responses import RedirectResponse
-
-
-app = FastAPI()
+from application import config
 
 load_dotenv()
+
+app = FastAPI()
+settings = config.get_settings()
+
+@app.get("/home")
+def homepage():
+    return {"hello": "world"}
 
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
@@ -32,10 +37,6 @@ async def read_item(request: Request):
 async def redirect_typer():
     return RedirectResponse("https://typer.tiangolo.com")
 
-@app.get("artist/")
-async def test_artist(_id):
-    url = spotify.get_artist("0TnOYISbd1XYRBk9myaseg", resource_type="artists")
-    return RedirectResponse("https://api.spotify.com/v1/artists/0TnOYISbd1XYRBk9myaseg")
  
 class SpotifyAPI(object):
     access_token = None
@@ -146,7 +147,7 @@ class SpotifyAPI(object):
    
 
 spotify = SpotifyAPI(client_id, client_secret)    
-print(spotify.perform_auth())
+#print(spotify.perform_auth())
 print(spotify.get_access_token())
 #print(spotify.search("Time", search_type="Track"))
 #print(spotify.get_artist("0TnOYISbd1XYRBk9myaseg"))
