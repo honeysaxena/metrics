@@ -12,16 +12,31 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from fastapi.responses import RedirectResponse
-from application import config
+from cassandra.cqlengine.management import sync_table
+from application.users.models import User
+from application import config, db
 
 load_dotenv()
 
 app = FastAPI()
-settings = config.get_settings()
+DB_SESSION = None
+#settings = config.get_settings()
+
+@app.on_event("startup")
+def on_startup():
+    print("Hello world")
+    global DB_SESSION
+    DB_SESSION = db.get_session()
+    sync_table(User)
 
 @app.get("/home")
 def homepage():
     return {"hello": "world"}
+
+@app.get("/users")
+def users_list_view():
+    q = User.objects.all().limit(10)
+    return list(q)
 
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
@@ -31,7 +46,11 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_item(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request})
+    context = {
+        "request": request,
+        "abc": 123
+    }
+    return templates.TemplateResponse("home.html", context)
 
 @app.get("/typer")
 async def redirect_typer():
