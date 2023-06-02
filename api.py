@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from fastapi.responses import RedirectResponse
-from . import config
+from application import config
 
 load_dotenv()
 
