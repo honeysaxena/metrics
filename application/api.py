@@ -5,6 +5,7 @@ import json
 import os
 import base64
 import datetime
+from pathlib import Path
 from urllib.parse import urlencode
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
@@ -14,12 +15,21 @@ from pydantic import BaseModel
 from fastapi.responses import RedirectResponse
 from cassandra.cqlengine.management import sync_table
 from application.users.models import User
-from application import config, db
+from application import config, db, utils
+from application.users.schemas import UserSignupSchema, UserLoginSchema
+from pydantic.error_wrappers import ValidationError
+from application.shortcuts import render, redirect
+
+BASE_DIR = Path(__file__).resolve().parent
+TEMPLATE_DIR = BASE_DIR / "templates"
 
 load_dotenv()
 
 app = FastAPI()
+templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
+
 DB_SESSION = None
+
 #settings = config.get_settings()
 
 @app.on_event("startup")
@@ -29,9 +39,6 @@ def on_startup():
     DB_SESSION = db.get_session()
     sync_table(User)
 
-@app.get("/home")
-def homepage():
-    return {"hello": "world"}
 
 @app.get("/users")
 def users_list_view():
@@ -42,32 +49,67 @@ client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
 
-@app.get("/", response_class=HTMLResponse)
-async def read_item(request: Request):
+@app.get("/home", response_class=HTMLResponse)
+async def homepage(request: Request):
     context = {
-        "request": request,
+    
+        "abc": "xyz"
+
     }
-    return templates.TemplateResponse("home.html", context)
+    response = render(request, "home.html", context)
+    #response = render(request, 'home.html', {})
+    '''
+    if len(cookies.keys()) > 0:
+        for k, v in cookies.items():
+            response.set_cookie(key='test', value='123', httponly=True)
+    for key in request.cookies.keys():
+        response.delete_cookie(key)
+    '''    
+    return response
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_get_view(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    session_id  = request.cookies.get("session_id") or None
+    return render(request, "login.html", {"logged_in": session_id is not None})
 
 @app.post("/login", response_class=HTMLResponse)
 async def login_post_view(request: Request, email: str=Form(...), password: str=Form(...)):
-    print(email, password)
-    return templates.TemplateResponse("login.html", {"request": request})
+    raw_data = {
+        "email": email,
+        "password": password,
+    }
+    data, errors = utils.valid_schema_data_or_error(raw_data, UserLoginSchema)
+    context = { 
+        "data": data, 
+        "errors": errors,
+        
+        }
+    if len(errors) > 0:
+        return render(request, "login.html", context,  status_code=400)
+    print(data)
+    return redirect("/home", cookies=data)
 
 @app.get("/signup", response_class=HTMLResponse)
 async def signup_get_view(request: Request):
-    return templates.TemplateResponse("signup.html", {"request": request})
+    return render(request, "signup.html", {})
 
 @app.post("/signup", response_class=HTMLResponse)
-async def signup_post_view(request: Request, email: str=Form(...), password: str=Form(...), password_confirm: str=Form(...)):
+async def signup_post_view(request: Request, email: str=Form(...), password: str=Form(...), confirm_password: str=Form(...)):
     print(email, password)
-    return templates.TemplateResponse("signup.html", {"request": request})
+    raw_data = {
+        "email": email,
+        "password": password,
+        "confirm_password": confirm_password
+    }
+    data, errors = utils.valid_schema_data_or_error(raw_data, UserSignupSchema)
+    context = {
+        "data": data,
+        "errors": errors
+        } 
+    if len(errors) > 0:
+        return render(request, "signup.html", context, status_code=400)       
+    return redirect("/login")
 
 @app.get("/typer")
 async def redirect_typer():
