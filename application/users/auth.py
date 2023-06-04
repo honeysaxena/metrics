@@ -28,7 +28,7 @@ def verify_user_id(token):
     try:
         data = jwt.decode(token, settings.secret_key, algorithms=[settings.jwt_algorithm])
     except jwt.ExpiredSignatureError as e:
-        print(e)
+        print(e, "log out user")
     except:
         pass
     if "user_id" not in data:

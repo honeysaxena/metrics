@@ -20,6 +20,9 @@ from application.users.schemas import UserSignupSchema, UserLoginSchema
 from pydantic.error_wrappers import ValidationError
 from application.shortcuts import render, redirect
 from application.users.decorators import login_required
+from application.users.backends import JWTCookieBackend
+from starlette.middleware.authentication import AuthenticationMiddleware
+from starlette.authentication import requires
 
 BASE_DIR = Path(__file__).resolve().parent
 TEMPLATE_DIR = BASE_DIR / "templates"
@@ -27,6 +30,8 @@ TEMPLATE_DIR = BASE_DIR / "templates"
 load_dotenv()
 
 app = FastAPI()
+app.add_middleware(AuthenticationMiddleware, backend=JWTCookieBackend())
+
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 DB_SESSION = None
@@ -55,12 +60,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/home", response_class=HTMLResponse)
 async def homepage(request: Request):
-    context = {
-    
-        "abc": "xyz"
-
-    }
-    response = render(request, "home.html", context)
+    if request.user.is_authenticated:
+        return render(request, 'dashboard.html', {}, status_code=200)
+    response = render(request, "home.html", {})
     #response = render(request, 'home.html', {})
     '''
     if len(cookies.keys()) > 0:
