@@ -19,6 +19,7 @@ from application import config, db, utils
 from application.users.schemas import UserSignupSchema, UserLoginSchema
 from pydantic.error_wrappers import ValidationError
 from application.shortcuts import render, redirect
+from application.users.decorators import login_required
 
 BASE_DIR = Path(__file__).resolve().parent
 TEMPLATE_DIR = BASE_DIR / "templates"
@@ -29,6 +30,8 @@ app = FastAPI()
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 DB_SESSION = None
+
+from application.handlers import * # noqa
 
 #settings = config.get_settings()
 
@@ -69,7 +72,11 @@ async def homepage(request: Request):
     return response
 
 @app.get("/account", response_class=HTMLResponse)
-async def homepage(request: Request):
+@login_required
+async def account_view(request: Request):
+    '''
+    Hello user
+    '''
     context = {}
     return render(request, "account.html", context)
    
