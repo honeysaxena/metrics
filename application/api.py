@@ -68,6 +68,12 @@ async def homepage(request: Request):
     '''    
     return response
 
+@app.get("/account", response_class=HTMLResponse)
+async def homepage(request: Request):
+    context = {}
+    return render(request, "account.html", context)
+   
+        
 @app.get("/login", response_class=HTMLResponse)
 async def login_get_view(request: Request):
     session_id  = request.cookies.get("session_id") or None
