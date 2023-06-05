@@ -1,5 +1,6 @@
-# import requests
 import requests
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 import json
 import os
@@ -23,18 +24,25 @@ from application.users.decorators import login_required
 from application.users.backends import JWTCookieBackend
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.authentication import requires
+from application.songs.models import Song
+from application.songs.routers import router as video_router
+
+DB_SESSION = None
 
 BASE_DIR = Path(__file__).resolve().parent
-TEMPLATE_DIR = BASE_DIR / "templates"
+#TEMPLATE_DIR = BASE_DIR / "templates"
 
 load_dotenv()
 
+client_id = os.getenv('CLIENT_ID')
+client_secret = os.getenv('CLIENT_SECRET')
+
 app = FastAPI()
 app.add_middleware(AuthenticationMiddleware, backend=JWTCookieBackend())
+app.include_router(video_router)
 
-templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
+#templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
-DB_SESSION = None
 
 from application.handlers import * # noqa
 
@@ -46,6 +54,7 @@ def on_startup():
     global DB_SESSION
     DB_SESSION = db.get_session()
     sync_table(User)
+    sync_table(Song)
 
 
 @app.get("/users")
@@ -53,8 +62,6 @@ def users_list_view():
     q = User.objects.all().limit(10)
     return list(q)
 
-client_id = os.getenv("CLIENT_ID")
-client_secret = os.getenv("CLIENT_SECRET")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -130,7 +137,7 @@ async def signup_post_view(request: Request, email: str=Form(...), password: str
 async def redirect_typer():
     return RedirectResponse("https://typer.tiangolo.com")
 
- 
+
 class SpotifyAPI(object):
     access_token = None
     access_token_expires = datetime.datetime.now()
@@ -236,18 +243,32 @@ class SpotifyAPI(object):
         query_params = urlencode({"q": query , "type": search_type.lower()})
         print(query_params)
         return self.base_search(query_params)
+    
+    def my_id(self):
+        birdy_uri = 'spotify:artist:2WX2uTcsvV5OnS0inACecP' 
+        spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
+        results = spotify.artist_albums(birdy_uri, album_type='album')
+        albums = results['items']
+        while results['next']:
+            results = spotify.next(results)
+            albums.extend(results['items'])
+
+        for album in albums:
+            print(album['name'])
+
+spotify = SpotifyAPI(client_id, client_secret)
 
    
-
-spotify = SpotifyAPI(client_id, client_secret)    
 #print(spotify.perform_auth())
 print(spotify.get_access_token())
+print(spotify.my_id())
 #print(spotify.search("Time", search_type="Track"))
 #print(spotify.get_artist("0TnOYISbd1XYRBk9myaseg"))
 #access_token = spotify.access_token
 #print(access_token)
 #print(spotify.search({"track": "Time"}, search_type="track"))
-
+#result = spotify.search({"artist": "pitbull"}, search_type="artist")
+#print(result)
 
 
 
