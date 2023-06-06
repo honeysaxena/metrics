@@ -52,9 +52,9 @@ class Video(Base):
         session.add(obj)
         
         session.commit()
-        
+        session.refresh(obj)
         return obj.host_id
 
 
-#obj = Video.add_video('https://www.youtube.com/watch?v=KQ-u4RcFLBY&t=17722s&ab_channel=CodingEntrepreneurs', user_id='8ccf1e1e-0494-11ee-a3c9-c87dd83ba6d7')
-#print(obj)
+obj = Video.add_video('https://www.youtube.com/watch?v=KQ-u4RcFLBY&t=17722s&ab_channel=CodingEntrepreneurs', user_id='8ccf1e1e-0494-11ee-a3c9-c87dd83ba6d7')
+print(obj)

@@ -64,6 +64,7 @@ class User(Base):
         #obj.password = password
         session.add(obj)
         session.commit()
+        session.refresh(obj)
         return obj 
     
     @staticmethod
@@ -85,6 +86,6 @@ Base.metadata.create_all(bind=engine)
 
 #user1 = User.create_user(email='abc@gmail.com', password='abc123')
 #print(user1) 
-obj = User.by_user_id(user_id='8ccf1e1e-0494-11ee-a3c9-c87dd83ba6d7')
-print(obj)
+#obj = User.by_user_id(user_id='8ccf1e1e-0494-11ee-a3c9-c87dd83ba6d7')
+#print(obj)
 
