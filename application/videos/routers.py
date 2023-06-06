@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from application.shortcuts import render
 
 router = APIRouter(
-    prefix='/videos'
+    prefix='/songs'
 )
   
 

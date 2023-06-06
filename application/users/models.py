@@ -1,16 +1,23 @@
 import uuid
-from cassandra.cqlengine.models import Model
-from cassandra.cqlengine import columns
+#from cassandra.cqlengine.models import Model
+#from cassandra.cqlengine import columns
+from sqlalchemy import Column, Text, UUID, String
 from application.config import get_settings
 from application.users import validators, security, exceptions
+from application.config import get_settings
+from application.db import engine, SessionLocal, Base
+from sqlalchemy.orm import Session
+from fastapi import Depends
 
 settings = get_settings()
 
-class User(Model):
-    __keyspace__ = settings.keyspace
-    email = columns.Text(primary_key=True)
-    user_id = columns.UUID(primary_key=True, default=uuid.uuid1)
-    password = columns.Text()
+session = SessionLocal()
+
+class User(Base):
+    __tablename__ = 'users'
+    email = Column(Text, primary_key=True)
+    user_id = Column(UUID, primary_key=True, default=uuid.uuid1)
+    password = Column(Text)
 
     def __str__(self):
         return self.__repr__()
@@ -30,9 +37,23 @@ class User(Model):
         verified, _ = security.verify_hash(pw_hash, pw_str)
         return verified   
     
+    #@staticmethod
+    #def create_user(email, password=None):
+    #    q = User.objects.filter(email=email)
+    #    if q.count() != 0:
+    #        raise exceptions.UserHasAccountException("user already has account with this email")
+    #    valid, msg, email = validators._validate_email(email)
+    #    if not valid:
+    #        raise exceptions.InvalidEmailException(f"Invalid email: {msg}")
+    #    obj = User(email=email)
+    #    obj.set_password(password)
+    #    #obj.password = password
+    #    obj.save()
+    #     return obj
+
     @staticmethod
-    def create_user(email, password=None):
-        q = User.objects.filter(email=email)
+    def create_user(email: Text, password: Text = None):
+        q = session.query(User).filter(User.email==email)
         if q.count() != 0:
             raise exceptions.UserHasAccountException("user already has account with this email")
         valid, msg, email = validators._validate_email(email)
@@ -41,19 +62,26 @@ class User(Model):
         obj = User(email=email)
         obj.set_password(password)
         #obj.password = password
-        obj.save()
+        session.add(obj)
+        session.commit()
         return obj 
     
     @staticmethod
     def check_exists(user_id):
-        q = User.objects.filter(user_id=user_id).allow_filtering()
+        q = session.query(User).filter(User.user_id==user_id).allow_filtering()
         return q.count() != 0
     
     @staticmethod
     def by_user_id(user_id=None):
         if user_id is None:
             return None
-        q = User.objects.filter(user_id=user_id).allow_filtering()
+        q = session.query(User).filter(User.user_id==user_id).allow_filtering()
         if q.count() != 1:
             return None
         return q.first()
+    
+
+Base.metadata.create_all(bind=engine)
+
+user1 = User.create_user(email='abc@gmail.com', password='abc123')
+print(user1)  
