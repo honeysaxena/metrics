@@ -68,14 +68,14 @@ class User(Base):
     
     @staticmethod
     def check_exists(user_id):
-        q = session.query(User).filter(User.user_id==user_id).allow_filtering()
+        q = session.query(User).filter(User.user_id==user_id)
         return q.count() != 0
     
     @staticmethod
     def by_user_id(user_id=None):
         if user_id is None:
             return None
-        q = session.query(User).filter(User.user_id==user_id).allow_filtering()
+        q = session.query(User).filter(User.user_id==user_id)
         if q.count() != 1:
             return None
         return q.first()
@@ -83,5 +83,8 @@ class User(Base):
 
 Base.metadata.create_all(bind=engine)
 
-user1 = User.create_user(email='abc@gmail.com', password='abc123')
-print(user1)  
+#user1 = User.create_user(email='abc@gmail.com', password='abc123')
+#print(user1) 
+obj = User.by_user_id(user_id='8ccf1e1e-0494-11ee-a3c9-c87dd83ba6d7')
+print(obj)
+

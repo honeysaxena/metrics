@@ -7,6 +7,9 @@ class UserLoginSchema(BaseModel):
     password: SecretStr
     session_id: str = None
 
+    class config:
+        orm_mode=True
+
     @root_validator
     def validate_user(cls, values):
         err_msg = "Inccorrect credentials, please try again."
