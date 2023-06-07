@@ -23,8 +23,15 @@
                 <div class="d-flex justify-content-center">
                     <div class="text-center">
                         <h1 class="mx-auto my-0 text-uppercase">Video app</h1>
+                        {% for object in object_list %}
+                        <li>
+                            <a href="{{ object.path }}">
+                            {% if not object.title %}{{ object.host_id }}{% else %}{{ object.title }}{% endif %}
+                            </a>
+                        </li>    
+                        {% endfor %}
                         
-                        <a class="btn btn-primary" href="login.html">Get Started</a>
+                        <!-- <a class="btn btn-primary" href="login.html">Get Started</a> -->
                     </div>
                 </div>
             </div>

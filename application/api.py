@@ -19,11 +19,14 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.authentication import requires
 from application.videos.models import Video
 from application.videos.routers import router as video_router
-from application.config import get_settings
+#from application.config import get_settings
 from application.users.models import Base
-from application.db import engine
+from application.db import engine, SessionLocal
+from sqlalchemy import Column, Text, UUID, String
 
 
+
+session = SessionLocal()
 Base.metadata.create_all(bind=engine)
 
 
@@ -44,18 +47,24 @@ from application.handlers import * # noqa
 
 #settings = config.get_settings()
 
-#@app.on_event("startup")
-#def on_startup():
-#    print("Hello world")
-#    global DB_SESSION
-#    DB_SESSION = db.get_session()
+@app.on_event("startup")
+def on_startup():
+    print("Hello world")
+    global DB_SESSION
+    DB_SESSION = db.get_db()
 #    sync_table(User)
 #    sync_table(Video)
 
-
+'''
 @app.get("/users")
 def users_list_view():
     q = User.objects.all().limit(10)
+    return list(q)
+'''
+
+@app.get("/users")
+def user_list_view():
+    q = session.query(User).values()
     return list(q)
 
 

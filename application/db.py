@@ -35,4 +35,11 @@ Base = declarative_base()
     
 #    return SessionLocal
 
+def get_db():
+    dbs = SessionLocal()
+    try:
+        yield dbs
+    finally:
+        dbs.close()    
+
 

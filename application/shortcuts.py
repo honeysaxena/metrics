@@ -1,7 +1,8 @@
 from application import config
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
-
+from application.db import get_db
+from sqlalchemy.orm import Session
 
 settings = config.get_settings()
 templates = Jinja2Templates(directory=str(settings.templates_dir))
@@ -15,7 +16,7 @@ def redirect(path, cookies:dict={}, remove_session=False):
         response.delete_cookie('session_id') 
     return response    
 
-def render(request, template_name, context={}, status_code:int=200, cookies:dict={}):
+def render(request, template_name, context:dict={}, status_code:int=200, cookies:dict={}):
     ctx = context.copy()
     ctx.update({"request": request})
     t = templates.get_template(template_name)

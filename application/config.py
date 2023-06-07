@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     db_client_password: str = Field(..., env='POSTGRES_CLIENT_PASSWORD')
     secret_key: str = Field(..., env='SECRET_KEY')
     jwt_algorithm: str = Field(default='HS256')
+    session_duration: int = Field(default=86400)
 
     class Config:
         env_file = '.env'

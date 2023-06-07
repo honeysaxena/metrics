@@ -54,6 +54,7 @@ class User(Base):
     @staticmethod
     def create_user(email: Text, password: Text = None):
         q = session.query(User).filter(User.email==email)
+        print(q)
         if q.count() != 0:
             raise exceptions.UserHasAccountException("user already has account with this email")
         valid, msg, email = validators._validate_email(email)
@@ -84,7 +85,7 @@ class User(Base):
 
 Base.metadata.create_all(bind=engine)
 
-#user1 = User.create_user(email='abc@gmail.com', password='abc123')
+#user1 = User.create_user(email='admin@gmail.com', password='abc123')
 #print(user1) 
 #obj = User.by_user_id(user_id='8ccf1e1e-0494-11ee-a3c9-c87dd83ba6d7')
 #print(obj)

@@ -9,3 +9,5 @@ def login_required(func):
             raise LoginRequiredException(status_code=401)
         return func(request, *args, **kwargs)
     return wrapper
+
+
