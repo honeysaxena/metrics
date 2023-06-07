@@ -50,7 +50,7 @@ def video_list_view(request: Request):
     }
     return render(request, "videos/list.html", context)
 
-@router.get("/detail", response_class=HTMLResponse)
-def song_detail_view(request: Request):
+@router.get("/{host_id}", response_class=HTMLResponse)
+def video_detail_view(request: Request, host_id: int):
     return render(request, "videos/detail.html", {})
 
